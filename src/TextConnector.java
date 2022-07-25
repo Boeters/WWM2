@@ -11,4 +11,9 @@ public class TextConnector {
         String testArray[] = buffer.split(",", 0);
         return testArray;
     }
+    public static String einlesen() throws IOException {
+        BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+        String buffer = input.readLine();
+        return buffer;
+    }
 }

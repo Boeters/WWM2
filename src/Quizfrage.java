@@ -1,4 +1,9 @@
+import jdk.swing.interop.SwingInterOpUtils;
+import org.w3c.dom.Text;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -8,7 +13,6 @@ public class Quizfrage {
     private String loesung;
     private int level;
     private int variation;
-    private Quizfrage fragenKatalog[] = new Quizfrage[15];
 
     // Konstruktor
 
@@ -31,32 +35,57 @@ public class Quizfrage {
         }
         return null;
     }
-    public void antwortenAusgeben(ArrayList<Quizfrage>fragen)
+    public void antwortenAusgeben(ArrayList<Quizfrage>fragen, int level)
     {
+        /*LOGIK:
+        * Hier muss aus der ArrayList <Quizfragen> die Frage + Antworten ausgegeben werden. Dabei ist das
+        * richtige Level zu beachten*/
         for (int i = 0; i <fragen.size() ; i++) {
-            System.out.println(fragen.get(0));
+            if(fragen.get(i).level==level)
+            {
+                System.out.println(fragen.get(i).frage);
+                for (int j = 0; j <4 ; j++) {
+                    System.out.println(fragen.get(i).antwort[j]);
+
+                }
+            }
 
         }
     }
-    public boolean antwortPruefen(String eingabe) throws IOException {
+    public boolean antwortPruefen(String eingabe, int index, ArrayList<Quizfrage> fragenkatalog) throws IOException {
         // die Loesung muss mit der Eingabe verglichen werden
-        // dafür den Markierbuchstaben (A,B,C,D) aus dem Loesungsstring auslesen
+        //dafür den Markierbuchstaben (A,B,C,D) aus dem Loesungsstring auslesen
+
         boolean pruefung = false;
-        String loesungsBuchstabe = String.valueOf(this.loesung.charAt(1)).toLowerCase();
-        if(eingabe.equals(loesungsBuchstabe))
+        /*
+        * Hier muss jetzt der Index von dem richtigen Quizfrage Objekt abgefragt werden*/
+        String loesungsBuchstabe = String.valueOf(fragenkatalog.get(index-1).loesung.charAt(1));
+        if(eingabe.equals(loesungsBuchstabe.toLowerCase())|| eingabe.equals(loesungsBuchstabe.toUpperCase()))
         {
             pruefung = true;
         }
-        else if(eingabe.equals("j"))
+        else if(eingabe.equals("j") || eingabe.equals("J"))
         {
             System.out.println("Wählen Sie zwischen >P< für Publikumsjoker(90%), >N< für neue Frage Joker oder >f< für fifty-Fifty joker");
-            switch(Partie.einlesen(1))
+            switch(TextConnector.einlesen())
             {
-                case "p": selectPublikumsJoker();
+                case "p", "P": selectPublikumsJoker();
+                    if(antwortPruefen(TextConnector.einlesen(),level,fragenkatalog))
+                    {
+                        pruefung = true;
+                    };
                 break;
-                case "n": selectNeueFrageJoker(level);
+                case "n","N": selectNeueFrageJoker(level);
+                    if(antwortPruefen(TextConnector.einlesen(),level,fragenkatalog))
+                    {
+                        pruefung = true;
+                    };
                 break;
-                case "f": selectFiftyFiftyJoker();
+                case "f","F": selectFiftyFiftyJoker();
+                    if(antwortPruefen(TextConnector.einlesen(),level,fragenkatalog))
+                    {
+                        pruefung = true;
+                    };;
             }
 
         }
@@ -105,10 +134,9 @@ public class Quizfrage {
             }
         }
         System.out.println("Das Publikum denkt Antwort:  " + hunderterArray[(int)Math.random()*99+0]+"   ist richtig.");
-        Partie.einlesen(1);
     }
 
-        public Quizfrage selectNeueFrageJoker(int level) throws IOException {
+        public static Quizfrage selectNeueFrageJoker(int level) throws IOException {
             Quizfrage quizfrage = new Quizfrage(level,2);
             return quizfrage.antwortenAusgeben();
     }
