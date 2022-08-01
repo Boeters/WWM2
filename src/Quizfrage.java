@@ -1,11 +1,6 @@
-import jdk.swing.interop.SwingInterOpUtils;
-import org.w3c.dom.Text;
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Locale;
+
 
 public class Quizfrage {
     private String frage;
@@ -13,6 +8,9 @@ public class Quizfrage {
     private String loesung;
     private int level;
     private int variation;
+    private boolean fiftyFiftyJoker = true;
+    private boolean neueFrageJoker = true;
+    private boolean publikumsJoker = true;
 
     // Konstruktor
 
@@ -35,7 +33,13 @@ public class Quizfrage {
         }
         return null;
     }
-    public void antwortenAusgeben(ArrayList<Quizfrage>fragen, int level)
+
+    public Quizfrage setAntwort(String[] antwort) {
+        this.antwort = antwort;
+        return null;
+    }
+
+    public Quizfrage antwortenAusgeben(ArrayList<Quizfrage>fragen, int level)
     {
         /*LOGIK:
         * Hier muss aus der ArrayList <Quizfragen> die Frage + Antworten ausgegeben werden. Dabei ist das
@@ -46,16 +50,14 @@ public class Quizfrage {
                 System.out.println(fragen.get(i).frage);
                 for (int j = 0; j <4 ; j++) {
                     System.out.println(fragen.get(i).antwort[j]);
-
                 }
             }
-
         }
+        return null;
     }
     public boolean antwortPruefen(String eingabe, int index, ArrayList<Quizfrage> fragenkatalog) throws IOException {
         // die Loesung muss mit der Eingabe verglichen werden
         //dafür den Markierbuchstaben (A,B,C,D) aus dem Loesungsstring auslesen
-
         boolean pruefung = false;
         /*
         * Hier muss jetzt der Index von dem richtigen Quizfrage Objekt abgefragt werden*/
@@ -66,26 +68,39 @@ public class Quizfrage {
         }
         else if(eingabe.equals("j") || eingabe.equals("J"))
         {
-            System.out.println("Wählen Sie zwischen >P< für Publikumsjoker(90%), >N< für neue Frage Joker oder >f< für fifty-Fifty joker");
+
+            System.out.println("Folgende Joker stehen zur verfügung");
+            if(neueFrageJoker)
+            {
+                System.out.print(">N< für neue Frage Joker");
+            }
+            if(fiftyFiftyJoker)
+            {
+                System.out.print(">F< für fifty-Fifty Joker");
+            }
+            if(publikumsJoker)
+            {
+                System.out.print(">P< für Publikumsjoker");
+            }
             switch(TextConnector.einlesen())
             {
-                case "p", "P": selectPublikumsJoker();
-                    if(antwortPruefen(TextConnector.einlesen(),level,fragenkatalog))
+                case "p", "P": selectPublikumsJoker(fragenkatalog,index);
+                    if(antwortPruefen(TextConnector.einlesen(),index,fragenkatalog))
                     {
                         pruefung = true;
                     };
                 break;
-                case "n","N": selectNeueFrageJoker(level);
-                    if(antwortPruefen(TextConnector.einlesen(),level,fragenkatalog))
+                case "n","N": selectNeueFrageJoker(index, fragenkatalog);
+                    if(antwortPruefen(TextConnector.einlesen(),index,fragenkatalog))
                     {
                         pruefung = true;
-                    };
+                    }
                 break;
-                case "f","F": selectFiftyFiftyJoker();
-                    if(antwortPruefen(TextConnector.einlesen(),level,fragenkatalog))
+                case "f","F": selectFiftyFiftyJoker(fragenkatalog,index);
+                    if(antwortPruefen(TextConnector.einlesen(),index,fragenkatalog))
                     {
                         pruefung = true;
-                    };;
+                    }
             }
 
         }
@@ -116,12 +131,39 @@ public class Quizfrage {
         this.antwort = antwortNachJoker;
         return false;
     }
+    public Quizfrage selectFiftyFiftyJoker(ArrayList<Quizfrage>quizfragen, int level)
+    {
 
+        /*
+        * Logik hier?
+        * vom richtigen Quizfrage objekt aus der fragenkatalog arraylist müssen 2 von 4 Antwortmöglichkeiten übrig bleiben.
+        * Darunter 1x die Richtige Antwort und eine zufällige falsche.*/
+
+        // TODO diese Methode hier überarbeiten, es funktioniert wirklich beschissen. SON DRECK
+        String array[] = new String[2];
+        for (int i = 0; i <4 ; i++) {
+            //if(quizfragen.get(level-1).getAntwort(i).equals(quizfragen.get(level-1).getLoesung()))
+            {
+                System.out.println(quizfragen.get(level-1).getAntwort(i));
+                System.out.println("Was passiert hier?");
+            }
+            //else
+            {
+                array[i%2] = quizfragen.get(level-1).getAntwort(i);
+            }
+            quizfragen.set(level-1,setAntwort(array));
+            System.out.println("hokus pokus shit.");
+
+        }
+
+
+        return quizfragen.get(level-1);
+    }
     public void selectPublikumsJoker() throws IOException {
         String hunderterArray[] = new String[100];
         // das 100 felder array mit 90x der Lösung füllen
         for (int i = 0; i < hunderterArray.length -10; i++) {
-            hunderterArray[i] = loesung;
+          //  hunderterArray[i] = quizfrage.get(level-1).getLoesung();
         }
         for (int i = hunderterArray.length-10; i < hunderterArray.length ; i++) {
             if(!antwort[i%4].equals(loesung))
@@ -133,21 +175,44 @@ public class Quizfrage {
                 hunderterArray[i] = antwort[i%4+1];
             }
         }
-        System.out.println("Das Publikum denkt Antwort:  " + hunderterArray[(int)Math.random()*99+0]+"   ist richtig.");
+        System.out.println("Das Publikum denkt Antwort:  " + hunderterArray[(int)Math.random()*99+1]+  "   ist richtig.");
     }
 
-        public static Quizfrage selectNeueFrageJoker(int level) throws IOException {
-            Quizfrage quizfrage = new Quizfrage(level,2);
-            return quizfrage.antwortenAusgeben();
+        public static Quizfrage selectNeueFrageJoker(int level, ArrayList<Quizfrage> quizfragen) throws IOException {
+            quizfragen.add(level-1,new Quizfrage(level,2));
+            return quizfragen.get(level-1).antwortenAusgeben();
+    }
+    public void selectPublikumsJoker(ArrayList<Quizfrage>quizfrage, int level)
+    {
+        if(publikumsJoker)
+        {
+            String hunderterArray[] = new String[100];
+            for (int i = 0; i <hunderterArray.length-10 ; i++) {
+                hunderterArray[i] = quizfrage.get(level-1).getLoesung();
+
+            }
+            for (int i = hunderterArray.length-10; i <hunderterArray.length ; i++) {
+                if(!quizfrage.get(level-1).getAntwort(i % 4).equals(quizfrage.get(level-1).getLoesung()))
+                {
+                    hunderterArray[i] = quizfrage.get(level-1).getAntwort(i % 4);
+                }
+                else
+                {
+                    hunderterArray[i] = quizfrage.get(level-1).getAntwort(i % 4+1);
+                }
+            }
+            System.out.println("Das Publikum denkt: Antwort   "+hunderterArray[((int)(Math.random()*99)+1)]+"    ist richtig.");
+            publikumsJoker = false;
+        }
+        else
+        {
+            System.out.println("Leider ist dieser Joker nicht mehr verfügbar");
+        }
     }
 
     // Getter und Setter
     public String getFrage() {
         return frage;
-    }
-
-    public String[] getAntwort() {
-        return antwort;
     }
 
     public String getAntwort(int index) {

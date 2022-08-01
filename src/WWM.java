@@ -1,31 +1,21 @@
-import org.w3c.dom.Text;
-
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-
 public class WWM {
     public static void main(String[] args) throws IOException {
 
-        int level = 0, variation = 1;
+        int level = 0;
         Partie runde1 = new Partie(1,1);
         boolean korrekteAntwort = false;
 
+        System.out.println((int)(Math.random()*99)+1);
         do {
             level++;
             runde1.partieStarten(level);
-            System.out.println(runde1.fragenkatalog.size());
-            korrekteAntwort=runde1.antwortPruefen(TextConnector.einlesen(),level, runde1.fragenkatalog);
+            String buffer = TextConnector.einlesen();
+            korrekteAntwort=runde1.antwortPruefen(buffer,level, runde1.getFragenkatalog());
         }while(korrekteAntwort);
+        System.out.println("Leider haben Sie verloren");
 
-
-
-
-
-
-
-        // TODO seit der umstellung auf ArrayList funktioniert antwortPruefen nicht mehr, muss vermutlich der Index mitgegeben werden (level-1)
-        // TODO Verknüpfung der Joker ODER eine Eingabeaufforderung nach dem Joker
-
+        // TODO: Methode fürs verlieren und Gewinnen
+        // TODO: Die Joker werden noch nicht "verbraucht"
     }
 }

@@ -7,19 +7,21 @@ public class Partie extends Quizfrage
     private boolean neueFrageJoker = true;
     private boolean publikumsJoker = true;
     private int preisgeld = 100;
-    ArrayList<Quizfrage> fragenkatalog = new ArrayList<>();
+    private ArrayList<Quizfrage> fragenkatalog = new ArrayList<>();
     public Partie(int level, int variation) throws IOException {
         super(level, variation);
     }
 
+    public ArrayList<Quizfrage> getFragenkatalog() {
+        return fragenkatalog;
+    }
 
     public Quizfrage partieStarten(int level) throws IOException {
         System.out.println("Wer wird Millionär?");
         System.out.println("Runde: "+level);
         System.out.println("Aktuelles Preisgeld: "+ getPreisgeld(level));
         fragenkatalog.add((level-1),new Quizfrage(level,1));
-        System.out.println("DEBUGAUSGABE: "+fragenkatalog.size());
-        return fragenkatalog.get(level-1).antwortenAusgeben();
+        return fragenkatalog.get(level-1).antwortenAusgeben(fragenkatalog,level);
 
     }
     public int getPreisgeld(int level)
@@ -30,5 +32,6 @@ public class Partie extends Quizfrage
         }
         return preisgeld1;
     }
+
 
 }
