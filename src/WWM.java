@@ -13,9 +13,9 @@ public class WWM {
             String buffer = TextConnector.einlesen();
             korrekteAntwort=runde1.antwortPruefen(buffer,level, runde1.getFragenkatalog());
         }while(korrekteAntwort);
-        System.out.println("Leider haben Sie verloren");
+        System.out.println(runde1.spielVerloren());
 
-        // TODO: Methode fürs verlieren und Gewinnen
-        // TODO: Die Joker werden noch nicht "verbraucht"
+
+
     }
 }
